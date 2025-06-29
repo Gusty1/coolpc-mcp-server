@@ -1,0 +1,23 @@
+{
+  "name": "coolpc-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for querying computer component specifications and prices",
+  "main": "build/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "start": "node build/index.js"
+  },
+  "keywords": ["mcp", "server", "computer", "components", "coolpc"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
