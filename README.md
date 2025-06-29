@@ -115,6 +115,18 @@ npm start
 比較 NVIDIA RTX 4070 和 RTX 4060 的規格和價格
 
 列出所有主機板的分類和數量
+
+查詢 AM5 腳位的 CPU，價格由低到高排序
+
+找出 6 核心的處理器
+
+搜尋 RTX 4060 顯示卡，價格由低到高
+
+找出 DDR5 32GB 的記憶體
+
+查詢 1TB 的 M.2 SSD
+
+找 AM5 腳位的 B650 晶片組主機板
 ```
 
 ## 可用工具
@@ -151,6 +163,63 @@ list_categories()
 ```typescript
 get_category_products({
   category: string    // 分類名稱
+})
+```
+
+### `search_cpu`
+專門搜尋 CPU 處理器，支援腳位、核心數篩選和價格排序
+```typescript
+search_cpu({
+  socket?: string,     // CPU 腳位 (如 'AM5', '1700', '1851', 'AM4')
+  cores?: number,      // 核心數量
+  sort_by?: string,    // 排序方式 ('price_asc' | 'price_desc')
+  limit?: number       // 結果數量限制 (預設: 10)
+})
+```
+
+### `search_gpu`
+專門搜尋顯示卡，支援晶片型號、記憶體容量篩選和價格排序
+```typescript
+search_gpu({
+  chipset?: string,    // GPU 晶片 (如 'RTX 4060', 'RTX 4070', 'RX 7600')
+  memory?: number,     // 記憶體容量 (GB)
+  sort_by?: string,    // 排序方式 ('price_asc' | 'price_desc')
+  limit?: number       // 結果數量限制 (預設: 10)
+})
+```
+
+### `search_ram`
+專門搜尋記憶體，支援類型、容量、頻率篩選和價格排序
+```typescript
+search_ram({
+  type?: string,       // 記憶體類型 (如 'DDR4', 'DDR5')
+  capacity?: number,   // 總容量 (GB)
+  frequency?: number,  // 頻率 (MHz，如 3200, 4800, 5600)
+  sort_by?: string,    // 排序方式 ('price_asc' | 'price_desc')
+  limit?: number       // 結果數量限制 (預設: 10)
+})
+```
+
+### `search_ssd`
+專門搜尋固態硬碟，支援介面、容量篩選和價格排序
+```typescript
+search_ssd({
+  interface?: string,  // 介面類型 (如 'M.2', 'SATA', 'NVMe', 'PCIe')
+  capacity?: number,   // 容量 (GB)
+  sort_by?: string,    // 排序方式 ('price_asc' | 'price_desc')
+  limit?: number       // 結果數量限制 (預設: 10)
+})
+```
+
+### `search_motherboard`
+專門搜尋主機板，支援腳位、晶片組、尺寸規格篩選和價格排序
+```typescript
+search_motherboard({
+  socket?: string,     // CPU 腳位 (如 'AM5', '1700', '1851', 'AM4')
+  chipset?: string,    // 晶片組 (如 'B650', 'X670', 'Z790', 'B760')
+  form_factor?: string,// 尺寸規格 (如 'ATX', 'mATX', 'ITX')
+  sort_by?: string,    // 排序方式 ('price_asc' | 'price_desc')
+  limit?: number       // 結果數量限制 (預設: 10)
 })
 ```
 

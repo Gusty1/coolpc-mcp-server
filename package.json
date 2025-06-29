@@ -1,6 +1,6 @@
 {
   "name": "coolpc-mcp-server",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "MCP server for querying Taiwan CoolPC computer component specifications and prices through Claude Desktop",
   "main": "build/index.js",
   "type": "module",
