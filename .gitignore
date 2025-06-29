@@ -71,5 +71,5 @@ product-*.json
 !product-sample.json
 
 # HTML data files (keep sample, ignore downloaded)
+evaluate.html
 evaluate-*.html
-!evaluate.html
