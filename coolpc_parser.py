@@ -146,13 +146,16 @@ class WorkingCoolPCParser:
             start_pos = match.end()
             
             # 找到下一個標籤的開始位置
-            next_tag_match = re.search(r'<(?:OPTION|OPTGROUP|/SELECT|/OPTGROUP)', select_content[start_pos:], re.IGNORECASE)
+            next_tag_match = re.search(r'<(?:OPTION|OPTGROUP|/SELECT|/OPTGROUP|/OPTION)', select_content[start_pos:], re.IGNORECASE)
             if next_tag_match:
                 end_pos = start_pos + next_tag_match.start()
             else:
                 end_pos = len(select_content)
             
             content = select_content[start_pos:end_pos].strip()
+            
+            # Remove any remaining HTML tags from content
+            content = re.sub(r'<[^>]*>', '', content)
             
             # 確定這個 OPTION 屬於哪個 OPTGROUP
             option_pos = match.start()
