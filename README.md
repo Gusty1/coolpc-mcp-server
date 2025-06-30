@@ -52,9 +52,6 @@ python3 coolpc_parser.py --download --json product.json
 # 2. 另存網頁為 evaluate.html
 # 3. 執行解析器
 python3 coolpc_parser.py evaluate.html --json product.json
-
-# 方法三：使用範例資料 (開發測試用)
-python3 coolpc_parser.py product-sample.json --json product.json
 ```
 
 ### 4. 建置 MCP Server
