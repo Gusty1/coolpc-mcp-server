@@ -44,14 +44,17 @@ npm install
 從原價屋網站取得最新資料並產生產品資料檔：
 
 ```bash
-# 方法一：使用範例資料
-python3 coolpc_parser.py evaluate.html --json product.json
+# 方法一：直接下載最新資料並解析 (推薦)
+python3 coolpc_parser.py --download --json product.json
 
-# 方法二：使用最新資料 (需要先從 https://www.coolpc.com.tw/evaluate.php 取得 HTML)
+# 方法二：使用本地 HTML 檔案
 # 1. 開啟瀏覽器到 https://www.coolpc.com.tw/evaluate.php
 # 2. 另存網頁為 evaluate.html
 # 3. 執行解析器
 python3 coolpc_parser.py evaluate.html --json product.json
+
+# 方法三：使用範例資料 (開發測試用)
+python3 coolpc_parser.py product-sample.json --json product.json
 ```
 
 ### 4. 建置 MCP Server
@@ -227,15 +230,18 @@ search_motherboard({
 
 ### 更新產品資料
 
-1. 從原價屋網站取得最新 HTML 資料
-2. 使用解析器產生新的 product.json
-3. 重新建置 MCP Server
+定期更新產品資料以確保價格和庫存資訊準確：
 
 ```bash
-# 解析新資料
-python3 coolpc_parser.py new_evaluate.html --json product.json
+# 方法一：直接下載最新資料 (推薦)
+python3 coolpc_parser.py --download --json product.json
 
-# 重新建置
+# 方法二：手動下載 HTML 檔案
+# 1. 從 https://www.coolpc.com.tw/evaluate.php 下載最新 HTML
+# 2. 解析資料
+python3 coolpc_parser.py evaluate.html --json product.json
+
+# 重新建置 MCP Server
 npm run build
 ```
 
