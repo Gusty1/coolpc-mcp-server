@@ -341,8 +341,13 @@ class WorkingCoolPCParser:
     
     def _extract_brand_model(self, text: str) -> Dict[str, str]:
         """提取品牌和型號"""
+        # Remove price and special symbols from the end to clean up text
         clean_text = re.sub(r'\$[0-9,]+.*$', '', text)
         clean_text = re.sub(r'[◆★↓→].*', '', clean_text)
+        clean_text = clean_text.strip()
+        
+        # Handle promotional prefixes like "[精選78X3D]", "[強勢精選7500F]"
+        clean_text = re.sub(r'^\[[^\]]+\]\s*', '', clean_text)
         
         # Handle both English and Chinese brand names
         # Pattern 1: Chinese brand followed by English brand (e.g., "威剛 ADATA")
@@ -361,27 +366,46 @@ class WorkingCoolPCParser:
                 model = None
             return {'brand': brand, 'model': model}
         
-        # Pattern 2: English brand only
+        # Pattern 2: English brand only (like AMD, Intel, etc.)
         brand_match = re.match(r'^([A-Za-z]+)', clean_text.strip())
         brand = brand_match.group(1) if brand_match else None
         
-        # First try to extract model from the product name before any brackets
-        # Look for patterns like "UMAX S330 240GB" where S330 is the model
         model = None
         if brand:
-            # Pattern: Brand ModelName Capacity/Specs
-            model_pattern = rf'^{brand}\s+([A-Za-z0-9\-]+)\s+(?:\d+(?:GB|TB|G)|/)'
-            model_match = re.search(model_pattern, clean_text.strip())
-            if model_match:
-                model = model_match.group(1)
+            # Special handling for CPU brands (AMD, Intel)
+            if brand in ['AMD', 'Intel']:
+                # For CPUs, extract the full model including series and specific model
+                # Examples: "AMD R7 7800X3D", "Intel i5-14400F", "AMD R5 3400G"
+                # Updated pattern to capture full CPU model names including X3D suffix
+                # Fixed: Handle various patterns - space before some keywords, no space before others
+                cpu_model_pattern = rf'^{brand}\s+([A-Za-z0-9\-X3D]+(?:\s+[A-Za-z0-9\-X3D]+)*?)(?:\s*(?:代理盒裝|盒)|(?:\s+MPK)|【)'
+                cpu_model_match = re.search(cpu_model_pattern, clean_text)
+                if cpu_model_match:
+                    model = cpu_model_match.group(1).strip()
+                else:
+                    # Fallback: try to extract everything after brand until common CPU description words
+                    # Updated to match the main pattern for consistency
+                    fallback_pattern = rf'^{brand}\s+([A-Za-z0-9\-X3D]+(?:\s+[A-Za-z0-9\-X3D]+)*?)(?:\s*(?:代理盒裝|盒|含風扇)|(?:\s+MPK)|【)'
+                    fallback_match = re.search(fallback_pattern, clean_text)
+                    if fallback_match:
+                        model = fallback_match.group(1).strip()
+            else:
+                # For non-CPU products, use the original logic
+                # Pattern: Brand ModelName Capacity/Specs
+                model_pattern = rf'^{brand}\s+([A-Za-z0-9\-]+)\s+(?:\d+(?:GB|TB|G)|/)'
+                model_match = re.search(model_pattern, clean_text.strip())
+                if model_match:
+                    model = model_match.group(1)
         
-        # If no model found yet, try the bracket method but exclude warranty info
+        # If no model found yet, try the bracket method but exclude warranty info and CPU specs
         if not model:
             # Find all bracket contents
             bracket_matches = re.findall(r'【([^】]+)】', clean_text)
             for bracket_content in bracket_matches:
-                # Skip if it's warranty info
-                if '年保' in bracket_content or '保固' in bracket_content:
+                # Skip if it's warranty info, CPU specs, or memory specs
+                if any(skip_pattern in bracket_content for skip_pattern in [
+                    '年保', '保固', '核/', '緒', 'GB', 'TB', 'MHz', 'W/', 'nm'
+                ]):
                     continue
                 model = bracket_content
                 break
