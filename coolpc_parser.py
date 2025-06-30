@@ -341,11 +341,47 @@ class WorkingCoolPCParser:
         clean_text = re.sub(r'\$[0-9,]+.*$', '', text)
         clean_text = re.sub(r'[◆★↓→].*', '', clean_text)
         
+        # Handle both English and Chinese brand names
+        # Pattern 1: Chinese brand followed by English brand (e.g., "威剛 ADATA")
+        chinese_english_match = re.match(r'^([\u4e00-\u9fff]+)\s+([A-Za-z]+)', clean_text.strip())
+        if chinese_english_match:
+            chinese_brand = chinese_english_match.group(1)
+            english_brand = chinese_english_match.group(2)
+            brand = f"{chinese_brand} {english_brand}"  # Keep both Chinese and English names
+            # Look for model after the brand names
+            # Pattern: 威剛 ADATA LEGEND 900 512GB
+            model_pattern = rf'^[\u4e00-\u9fff]+\s+{english_brand}\s+([A-Za-z0-9\s\-]+?)(?:\s+\d+(?:GB|TB|G)|/)'
+            model_match = re.search(model_pattern, clean_text.strip())
+            if model_match:
+                model = model_match.group(1).strip()
+            else:
+                model = None
+            return {'brand': brand, 'model': model}
+        
+        # Pattern 2: English brand only
         brand_match = re.match(r'^([A-Za-z]+)', clean_text.strip())
         brand = brand_match.group(1) if brand_match else None
         
-        model_match = re.search(r'【([^】]+)】', clean_text)
-        model = model_match.group(1) if model_match else None
+        # First try to extract model from the product name before any brackets
+        # Look for patterns like "UMAX S330 240GB" where S330 is the model
+        model = None
+        if brand:
+            # Pattern: Brand ModelName Capacity/Specs
+            model_pattern = rf'^{brand}\s+([A-Za-z0-9\-]+)\s+(?:\d+(?:GB|TB|G)|/)'
+            model_match = re.search(model_pattern, clean_text.strip())
+            if model_match:
+                model = model_match.group(1)
+        
+        # If no model found yet, try the bracket method but exclude warranty info
+        if not model:
+            # Find all bracket contents
+            bracket_matches = re.findall(r'【([^】]+)】', clean_text)
+            for bracket_content in bracket_matches:
+                # Skip if it's warranty info
+                if '年保' in bracket_content or '保固' in bracket_content:
+                    continue
+                model = bracket_content
+                break
         
         return {'brand': brand, 'model': model}
     
