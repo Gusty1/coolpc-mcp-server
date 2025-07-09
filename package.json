@@ -7,8 +7,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/index.ts",
-    "start": "npx supergateway --stdio \"node ./build/index.js\" --port 8000 --baseUrl http://localhost:8000 --ssePath /sse --messagePath /message",
-    "start_origin": "node build/index.js"
+    "start": "node build/index.js"
   },
   "keywords": [
     "mcp",
