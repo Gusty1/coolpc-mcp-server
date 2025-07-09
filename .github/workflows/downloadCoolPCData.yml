@@ -23,19 +23,44 @@ jobs:
     - name: 安裝必要的 Python 模組
       run: |
         python -m pip install --upgrade pip
-        # pip install -r requirements.txt
+
+    - name: 設定 Node.js 環境
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20' # 建議使用最新的 LTS 版本，例如 '20' 或 '22'
+
+    - name: 安裝 NPM 依賴 (如果您的專案有 package.json)
+      run: npm ci # 更可靠地安裝依賴，而不是 npm install
 
     - name: 執行 CoolPC Parser
       run: python3 coolpc_parser.py --download --json product.json
+
+    - name: 執行 NPM Build (如果檔案有異動)
+      id: npm_build # 給這個步驟一個ID，以便後續判斷是否執行
+      run: |
+        # 檢查 evaluate.html 或 product.json 是否有變動
+        if git diff --exit-code evaluate.html product.json > /dev/null; then
+          echo "evaluate.html 或 product.json 沒有變動，跳過 npm build"
+          echo "skip_build=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "evaluate.html 或 product.json 有變動，執行 npm build"
+          npm run build
+          echo "skip_build=false" >> "$GITHUB_OUTPUT"
+        fi
 
     - name: 檢查並提交變更
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
 
-        # 檢查是否有檔案變更
-        git add evaluate.html product.json
-        git diff-index --quiet HEAD || git commit -m "Auto: 更新 evaluate.html 和 product.json"
-        
-        # 如果有新的提交，則推送到遠端倉庫
-        git push || echo "沒有新的變更需要推送到遠端。"
+        # 添加所有可能變更的檔案
+        git add evaluate.html product.json build/
+
+        # 檢查是否有任何檔案變更
+        if ! git diff-index --quiet HEAD; then
+          git commit -m "Auto: 更新資料與建置檔案" # 更新提交訊息以反映更廣泛的變更
+          git push
+        else
+          echo "沒有新的變更需要推送到遠端。"
+        fi
+      if: success()
