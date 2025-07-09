@@ -7,9 +7,20 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/index.ts",
-    "start": "node build/index.js"
+    "start": "npx supergateway --stdio node ./build/index.js",
+    "start_origin": "node build/index.js"
   },
-  "keywords": ["mcp", "server", "computer", "components", "coolpc", "taiwan", "claude", "ai", "pricing"],
+  "keywords": [
+    "mcp",
+    "server",
+    "computer",
+    "components",
+    "coolpc",
+    "taiwan",
+    "claude",
+    "ai",
+    "pricing"
+  ],
   "author": "shyuan",
   "license": "MIT",
   "repository": {

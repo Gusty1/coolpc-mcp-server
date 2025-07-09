@@ -66,10 +66,10 @@ coverage/
 *.temp
 
 # Product data files (keep sample, ignore generated)
-product.json
-product-*.json
-!product-sample.json
+# product.json
+# product-*.json
+# !product-sample.json
 
 # HTML data files (keep sample, ignore downloaded)
-evaluate.html
-evaluate-*.html
+# evaluate.html
+# evaluate-*.html
