@@ -23,7 +23,7 @@ jobs:
     - name: 安裝必要的 Python 模組
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        # pip install -r requirements.txt
 
     - name: 執行 CoolPC Parser
       run: python3 coolpc_parser.py --download --json product.json
