@@ -34,16 +34,18 @@ jobs:
 
     - name: 執行 CoolPC Parser
       run: python3 coolpc_parser.py --download --json product.json
+      # 注意：如果 coolpc_parser.py 預設仍然會產生 evaluate.html，
+      # 且您不希望它存在於倉庫中，請確保它被 .gitignore 忽略。
 
     - name: 執行 NPM Build (如果檔案有異動)
       id: npm_build # 給這個步驟一個ID，以便後續判斷是否執行
       run: |
-        # 檢查 evaluate.html 或 product.json 是否有變動
-        if git diff --exit-code evaluate.html product.json > /dev/null; then
-          echo "evaluate.html 或 product.json 沒有變動，跳過 npm build"
+        # 檢查 product.json 是否有變動
+        if git diff --exit-code product.json > /dev/null; then
+          echo "product.json 沒有變動，跳過 npm build"
           echo "skip_build=true" >> "$GITHUB_OUTPUT"
         else
-          echo "evaluate.html 或 product.json 有變動，執行 npm build"
+          echo "product.json 有變動，執行 npm build"
           npm run build
           echo "skip_build=false" >> "$GITHUB_OUTPUT"
         fi
@@ -54,11 +56,11 @@ jobs:
         git config user.email "github-actions[bot]@users.noreply.github.com"
 
         # 添加所有可能變更的檔案
-        git add evaluate.html product.json build/
+        git add product.json build/ # 移除了 evaluate.html
 
         # 檢查是否有任何檔案變更
         if ! git diff-index --quiet HEAD; then
-          git commit -m "Auto: 更新資料與建置檔案" # 更新提交訊息以反映更廣泛的變更
+          git commit -m "Auto: 更新 product.json 與建置檔案" # 更新提交訊息
           git push
         else
           echo "沒有新的變更需要推送到遠端。"
