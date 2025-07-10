@@ -23,44 +23,23 @@ jobs:
     - name: 安裝必要的 Python 模組
       run: |
         python -m pip install --upgrade pip
-
-    - name: 設定 Node.js 環境
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20' # 建議使用最新的 LTS 版本，例如 '20' 或 '22'
-
-    - name: 安裝 NPM 依賴 (如果您的專案有 package.json)
-      run: npm ci # 更可靠地安裝依賴，而不是 npm install
+        # pip install -r requirements.txt # 如果您的 coolpc_parser.py 檔案需要額外模組，請解除註解此行
 
     - name: 執行 CoolPC Parser
       run: python3 coolpc_parser.py --download --json product.json
-      # 注意：如果 coolpc_parser.py 預設仍然會產生 evaluate.html，
-      # 且您不希望它存在於倉庫中，請確保它被 .gitignore 忽略。
+      # 這個指令會將 product.json 產生在專案根目錄。
 
-    - name: 執行 NPM Build (如果檔案有異動)
-      id: npm_build # 給這個步驟一個ID，以便後續判斷是否執行
-      run: |
-        # 檢查 product.json 是否有變動
-        if git diff --exit-code product.json > /dev/null; then
-          echo "product.json 沒有變動，跳過 npm build"
-          echo "skip_build=true" >> "$GITHUB_OUTPUT"
-        else
-          echo "product.json 有變動，執行 npm build"
-          npm run build
-          echo "skip_build=false" >> "$GITHUB_OUTPUT"
-        fi
-
-    - name: 檢查並提交變更
+    - name: 檢查並提交 product.json 變更
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
 
-        # 添加所有可能變更的檔案
-        git add product.json build/ # 移除了 evaluate.html
+        # 添加 product.json
+        git add product.json
 
-        # 檢查是否有任何檔案變更
+        # 檢查 product.json 是否有任何檔案變更
         if ! git diff-index --quiet HEAD; then
-          git commit -m "Auto: 更新 product.json 與建置檔案" # 更新提交訊息
+          git commit -m "Auto: 更新 product.json" # 更新提交訊息
           git push
         else
           echo "沒有新的變更需要推送到遠端。"
